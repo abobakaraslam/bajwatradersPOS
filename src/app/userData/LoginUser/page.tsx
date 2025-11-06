@@ -22,15 +22,17 @@ export default function Login() {
       return;
     }
     
+
     setloadingLogin(true);
     setButtonDisable(true);
     setError("");
 
     try {
-      const response = await fetch("../../api/userData/login_user", {
+      const response = await fetch("/api/userData/login_user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.toLowerCase().trim(), password }),
+        credentials: "include", // 🔥 VERY IMPORTANT — ensures cookies are stored/sent
       });
 
       const data = await response.json();
