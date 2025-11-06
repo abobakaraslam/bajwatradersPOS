@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import BillRecord from "./component/BillRecord/page";
 import SaleProduct from "./component/SaleProduct/page";
 
-
 export default function ProfileAdmin(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<"dashboard" | "sale" | "bill">("dashboard");
@@ -16,7 +15,9 @@ export default function ProfileAdmin(): JSX.Element {
 useEffect(() => {
   //console.log("ProfileUser is loading...");
     async function validateSession() {
-      const res = await fetch("/api/auth/validate-session");
+      const res = await fetch("/api/auth/validate-session", {
+        credentials: "include"  // this is critical
+      });
       const data = await res.json();
       //console.log("ProfileUser Page, Responsded data from /api/auth/validate-session ", data)
       if (!data.valid) {
