@@ -6,6 +6,7 @@ import User from "@/models/User";
 import crypto from "crypto";
 import { cookies } from "next/headers";
 
+
 export async function POST(req: Request) {
   await connectToDatabase();
   const { email, password } = await req.json();
