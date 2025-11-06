@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({
-      success: true,
+      success: "OK",
       message: "Login successful",
     });
 
@@ -67,3 +67,4 @@ export async function POST(req: Request) {
     });
   }
 }
+
