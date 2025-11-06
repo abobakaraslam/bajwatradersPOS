@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
     cookies().set("sessionId", sessionId, {
       httpOnly: true,
-      secure: isProduction,                 // Secure only on HTTPS
+      secure: false,                 
       sameSite: isProduction ? "none" : "lax", // Allow cross-site cookies in prod
       maxAge: 60 * 30,                      // 30 minutes
       path: "/",                            // Available across site
@@ -67,4 +67,5 @@ export async function POST(req: Request) {
     });
   }
 }
+
 
