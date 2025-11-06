@@ -48,10 +48,10 @@ export async function POST(req: Request) {
     cookies().set("sessionId", sessionId, {
       httpOnly: true,
       secure: false,                 
-      sameSite: isProduction ? "none" : "lax", // Allow cross-site cookies in prod
+      sameSite: "lax",
       maxAge: 60 * 30,                      // 30 minutes
       path: "/",                            // Available across site
-      domain: isProduction ? ".edu2skill.online" : undefined, // enables subdomain sharing
+      domain: undefined,
     });
 
     return NextResponse.json({
@@ -67,5 +67,6 @@ export async function POST(req: Request) {
     });
   }
 }
+
 
 
