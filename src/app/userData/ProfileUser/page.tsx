@@ -20,10 +20,11 @@ useEffect(() => {
       const data = await res.json();
       //console.log("ProfileUser Page, Responsded data from /api/auth/validate-session ", data)
       if (!data.valid) {
-        //console.log("Return to LoginUser page");
+        console.log("Return to LoginUser page");
+        console.log("Reason: ", data.reason);
         router.push("/userData/LoginUser");
       } else {
-        //console.log("Not Return to LoginUser page, but loading=false");
+        console.log("successfully login");
         setLoading(false);
       }
     }
