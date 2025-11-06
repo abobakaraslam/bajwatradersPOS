@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   cookies().set("sessionId", sessionId, {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "strict",
     maxAge: 60 * 30,
     path: "/",
@@ -33,3 +33,4 @@ export async function POST(req: Request) {
 
   return Response.json({ message: "Login successful" });
 }
+
