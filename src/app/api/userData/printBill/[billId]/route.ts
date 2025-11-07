@@ -10,7 +10,7 @@ export const revalidate = 0;
  * Converts a Pakistan local datetime string to a UTC Date object.
  * This ensures correct handling when MongoDB stores dates in UTC.
  */
-export function pakistanLocalToUTC(localDateTime: string): Date {
+function pakistanLocalToUTC(localDateTime: string): Date {
   // Append timezone offset (+05:00 for Pakistan Standard Time)
   return new Date(localDateTime + "+05:00");
 }
