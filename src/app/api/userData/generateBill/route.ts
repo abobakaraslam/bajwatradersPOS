@@ -1,3 +1,4 @@
+/*File: route.ts located in api/userData/generateBill/     */
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import SaleDatabaseModel from "@/models/SaleDatabaseModel";
@@ -24,9 +25,11 @@ export async function POST(req: Request) {
     Insertion in SaleDatabaseModel
     */
     // Get number of Sales
+    let rand_number = Math.floor(Math.random() * 90) + 10;
     let n_sale = await SaleDatabaseModel.countDocuments();
 
-    let billID = `Bill-${n_sale+1}`;
+
+    let billID = `Bill-${n_sale+1}-${rand_number}`;
     
     for (let index = 0; index < cart.length; index++) {
       let priceSale = cart[index].priceSale;
@@ -38,7 +41,7 @@ export async function POST(req: Request) {
 
       let pricePurchase_fetched = product_fetched[0].pricePurchase;
 
-      let assignSaleid = `Sale-${n_sale + 1}`;
+      let assignSaleid = `Sale-${n_sale + 1}-${rand_number}`;
 
 
       const productName_fetched = await ProductNameDatabase.find({ productId: productId });
