@@ -8,7 +8,10 @@ import PurchaseDatabase from "@/models/PurchaseDatabase";
 export async function GET() {
   try {
     // Connect to MongoDB using Mongoose
-    await connectToDatabase();
+    const isConnected = await connectToDatabase();
+    if (!isConnected) {
+      return NextResponse.json({ success: false, message:  "Not Connected to Database"});
+    }
 
     // Fetch data from database
     const product_fetched = await Product.find();
