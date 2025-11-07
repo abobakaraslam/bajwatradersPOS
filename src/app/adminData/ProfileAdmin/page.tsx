@@ -1,3 +1,4 @@
+/*File: page.tsx loacated in src/app/adminData/ProfileAdmin/       */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,14 +20,19 @@ export default function ProfileAdmin(): JSX.Element {
 useEffect(() => {
   //console.log("ProfileAdmin is loading...");
     async function validateSession() {
-      const res = await fetch("/api/auth/validate-session");
+      const res = await fetch("/api/auth/validate-session", {
+        credentials: "include" // ensures cookies are stored/sent
+      });
       const data = await res.json();
       //console.log("ProfileAdmin Page, Responsded data from /api/auth/validate-session ", data)
       if (!data.valid) {
-        //console.log("Return to LoginAdmin page");
+        console.log("Return to LoginAdmin page");
+        console.log("Reason: ", data.reason);
         router.push("/adminData/LoginAdmin");
       } else {
-        //console.log("Not Return to LoginAdmin page, but loading=false");
+        //await refreshSession();
+        console.log("successfully login");
+        console.log("Reason: ", data.reason);
         setLoading(false);
       }
     }
