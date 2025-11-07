@@ -108,6 +108,7 @@ export default function AddProductForm(): JSX.Element {
             console.log("response from fetching-products: ", res);
             if (!res.ok) throw new Error("Failed to fetch products");
             const data = await res.json();
+            console.log("data from fetching-products: ", data);
     
             const extracted_array = data.products.map((product: any) => {
               const stockItem = data.stock.find(
