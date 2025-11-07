@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionContext";
 
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +38,7 @@ export default function Login() {
       const data = await response.json();
 
       if (data.success === "OK") {
+        await refreshSession();
         console.log("successfully logged in");
         router.push("/userData/ProfileUser");
       } else {
