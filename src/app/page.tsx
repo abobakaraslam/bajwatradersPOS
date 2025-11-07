@@ -10,7 +10,7 @@ export default function Home() {
   const handleManagerClick = () => router.push("/adminData/LoginAdmin");
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="lg:h-screen flex flex-col">
       <Navbar />
 
       {/* Main content */}
