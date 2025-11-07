@@ -521,4 +521,3 @@ export default function AddProductForm(): JSX.Element {
     </div>
   );
 }
-
