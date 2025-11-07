@@ -1,3 +1,4 @@
+/*File: page.tsx located in src/app/adminData/ProfileAdmin/component/AddProductForm/   */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -154,9 +155,9 @@ export default function AddProductForm(): JSX.Element {
     const selectedProduct = selectedProductState;
 
     let selectedProductID = selectedProduct?.productId;
-    //console.log("selectedProductID: ", selectedProductID);
+    console.log("selectedProductID: ", selectedProductID);
     let selectedProductName = selectedProduct?.productName;
-    //console.log("selectedProductName: ", selectedProductName);
+    console.log("selectedProductName: ", selectedProductName);
 
     /* NewProductName is either required or not, depending upon above select */
     let requireNewProduct = 1; // 1 for yes
