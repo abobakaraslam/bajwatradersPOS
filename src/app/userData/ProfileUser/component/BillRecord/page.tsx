@@ -1,4 +1,4 @@
-/*File: page.tsx located in app/userData/ProfileUser/component/BillRecord */
+/* File: page.tsx located in app/userData/ProfileUser/component/BillRecord */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -43,22 +43,34 @@ export default function BillRecord(): JSX.Element {
     setError("");
     setLoading(true);
 
-    const finalEndDate = endDate || startDate;
+    const formattedStartDate = startDate;
+    const formattedEndDate = endDate || startDate;
 
     try {
       const response = await fetch("/api/adminData/billRecord/getByDate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ startDate, endDate: finalEndDate }),
+        cache: "no-store", // prevents browser & proxy caching
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+        body: JSON.stringify({
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        }),
       });
 
       const data = await response.json();
+      //console.log("bill data:", data);//output: {success: true, bills: Array(1)}
 
       if (data.success) {
         const sorted = data.bills.sort(
           (a: BillGroup, b: BillGroup) =>
             new Date(a._id.date).getTime() - new Date(b._id.date).getTime()
         );
+
         setBills(sorted);
         setShowBills(true);
       } else {
@@ -73,14 +85,11 @@ export default function BillRecord(): JSX.Element {
       setLoading(false);
     }
   };
+
   const handlePrintTwice = (e: React.MouseEvent<HTMLButtonElement>) => {
-    //console.log("printing bill")
-     const billId = e.currentTarget.value;
-    //console.log("Bill ID:", billId);
-    // Your print logic
-    // Redirect to Bill Page
+    const billId = e.currentTarget.value;
     router.push(`/userData/bill/${billId}`);
-  }
+  };
 
   const overall = useMemo(() => {
     if (!bills.length) return { sale: 0 };
@@ -120,10 +129,10 @@ export default function BillRecord(): JSX.Element {
         </h2>
 
         {showBills && bills.length === 0 && (
-        <div className="text-center text-red-600 mb-5">
-          No bills found for the selected date range.
-        </div>
-      )}
+          <div className="text-center text-red-600 mb-5">
+            No bills found for the selected date range.
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           <div>
@@ -163,81 +172,107 @@ export default function BillRecord(): JSX.Element {
         </div>
       </div>
 
-      {showBills && bills.length > 0 && (
-        <div className="mt-10 w-full max-w-6xl space-y-8">
-          <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-lg rounded-2xl p-6 mb-6">
-            <h3 className="text-xl font-semibold mb-4 text-center">
-              Overall Summary ({bills.length} Bills)
+{showBills && bills.length > 0 && (
+  <div className="mt-10 w-full max-w-6xl space-y-8">
+    {/* Overall Summary */}
+    <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-lg rounded-2xl p-6 mb-6">
+      <h3 className="text-xl font-semibold mb-4 text-center">
+        Overall Summary ({bills.length} Bills)
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6 text-center">
+        <div className="bg-white/10 p-4 rounded-xl">
+          <p className="text-sm uppercase text-gray-200 mb-1">Total Sale Amount</p>
+          <p className="text-2xl font-bold">
+            Rs. {overall.sale.toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Bills Grouped by Date */}
+    {groupedByDate.map((group, index) => {
+      const color = headerColors[index % 2];
+      return (
+        <div key={formatDate(group.date)} className="space-y-6">
+          {/* Date Header */}
+          <div
+            className={`bg-gradient-to-r ${color} text-white shadow-md rounded-2xl p-5`}
+          >
+            <h3 className="text-lg font-semibold mb-3 text-center">
+              {formatDate(group.date)} ({group.bills.length} Bills)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-1 gap-6 text-center">
-              <div className="bg-white/10 p-4 rounded-xl">
-                <p className="text-sm uppercase text-gray-200 mb-1">Total Sale Amount</p>
-                <p className="text-2xl font-bold">Rs. {overall.sale.toLocaleString()}</p>
+              <div className="bg-white/10 p-3 rounded-xl">
+                <p className="text-sm uppercase text-gray-200 mb-1">Total Sale</p>
+                <p className="text-xl font-bold">
+                  Rs. {group.sale.toLocaleString()}
+                </p>
               </div>
             </div>
           </div>
 
-          {groupedByDate.map((group, index) => {
-            const color = headerColors[index % 2];
-            return (
-              <div key={formatDate(group.date)} className="space-y-6">
-                <div className={`bg-gradient-to-r ${color} text-white shadow-md rounded-2xl p-5`}>
-                  <h3 className="text-lg font-semibold mb-3 text-center">
-                    {formatDate(group.date)} ({group.bills.length} Bills)
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-6 text-center">
-                    <div className="bg-white/10 p-3 rounded-xl">
-                      <p className="text-sm uppercase text-gray-200 mb-1">Total Sale</p>
-                      <p className="text-xl font-bold">Rs. {group.sale.toLocaleString()}</p>
-                      
-                    </div>
-                  </div>
-                </div>
-
-                {group.bills.map((bill, i) => (
-                  <div
-                    key={i}
-                    className="bg-white shadow-md rounded-2xl border border-gray-200 overflow-hidden"
-                  >
-                    <div className={`bg-gradient-to-r ${color} text-white p-4 flex justify-between items-center`}>
-                      <h3 className="font-semibold">Bill ID: {bill._id.billId}</h3>
-                      <p>{formatDate(bill._id.date)}</p>
-                    </div>
-
-                    <table className="min-w-full text-sm text-left">
-                      <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
-                        <tr>
-                          <th className="px-4 py-3">Item</th>
-                          <th className="px-4 py-3">Qty</th>
-                          <th className="px-4 py-3">P/U</th>
-                          <th className="px-4 py-3">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {bill.items.map((item, j) => (
-                          <tr key={j} className="border-b hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-2">{item.productName}</td>
-                            <td className="px-4 py-2">{item.quantitySold}</td>
-                            <td className="px-4 py-2">{item.priceSalePerUnit}</td>
-                            <td className="px-4 py-2">{item.priceSaleAmount}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-
-                    <div className="bg-blue-50 px-6 py-4 flex justify-between text-sm text-gray-700">
-                      <span>Total Sale: Rs. {bill.totalSaleAmount.toLocaleString()}</span>
-                      <button className="p-2" value={bill._id.billId}  onClick={handlePrintTwice}>Print</button>
-                    </div>
-                  </div>
-                ))}
+          {/* Individual Bills */}
+          {group.bills.map((bill, i) => (
+            <div
+              key={i}
+              className="bg-white shadow-md rounded-2xl border border-gray-200 overflow-hidden"
+            >
+              {/* Bill Header */}
+              <div
+                className={`bg-gradient-to-r ${color} text-white p-4 flex justify-between items-center`}
+              >
+                <h3 className="font-semibold">Bill ID: {bill._id.billId}</h3>
+                <p>{formatDate(bill._id.date)}</p>
               </div>
-            );
-          })}
-        </div>
-      )}
 
-      
+              {/* Bill Items Table */}
+              <table className="min-w-full text-sm text-left">
+                <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+                  <tr>
+                    <th className="px-4 py-3">Item</th>
+                    <th className="px-4 py-3">Qty</th>
+                    <th className="px-4 py-3">P/U</th>
+                    <th className="px-4 py-3">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bill.items.map((item, j) => (
+                    <tr
+                      key={j}
+                      className="border-b hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-4 py-2">{item.productName}</td>
+                      <td className="px-4 py-2">{item.quantitySold}</td>
+                      <td className="px-4 py-2">{item.priceSalePerUnit}</td>
+                      <td className="px-4 py-2">{item.priceSaleAmount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Bill Footer */}
+              <div className="bg-blue-50 px-6 py-4 flex justify-between text-sm text-gray-700">
+                <span>
+                  Total Sale: Rs. {bill.totalSaleAmount.toLocaleString()}
+                </span>
+                <button
+                  className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  value={bill._id.billId}
+                  onClick={handlePrintTwice}
+                >
+                  Print
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    })}
+  </div>
+)}
+
+
     </div>
   );
 }
