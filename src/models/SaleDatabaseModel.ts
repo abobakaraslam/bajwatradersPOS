@@ -12,6 +12,7 @@ export interface ISales extends Document {
   profit: number;
   customerId: string;
   billId: string;
+  iDate: Date;
 }
 
 // Define Sales Schema
@@ -20,42 +21,55 @@ const saleSchema = new Schema<ISales>(
     saleId: {
       type: String,
       required: true,
-      },
+    },
     productId: {
       type: String,
       required: true,
-      },
+    },
     productName: {
       type: String,
       required: true,
-      },
+    },
     quantitySold: {
       type: Number,
-      required: [true, "Quantity is required"]
+      required: [true, "Quantity is required"],
     },
     priceSalePerUnit: {
       type: Number,
-      required: [true, "priceSalePerUnit Price is required"]
+      required: [true, "Sale unit price is required"],
     },
     priceSaleAmount: {
       type: Number,
-      required: [true, "Sale Price is required"]
+      required: [true, "Total sale amount is required"],
     },
     pricePurchase: {
       type: Number,
-      required: [true, "pricePurchase Price is required"]
+      required: [true, "Purchase price is required"],
     },
     profit: {
       type: Number,
-      required: [true, "profit Price is required"]
+      required: [true, "Profit is required"],
     },
     customerId: {
       type: String,
-      required: [true, "customer ID is required"]
+      required: [true, "Customer ID is required"],
     },
     billId: {
       type: String,
-      required: [true, "Bill ID is required"]
+      required: [true, "Bill ID is required"],
+    },
+
+    // --- Important Section ---
+    iDate: {
+      type: Date,
+      required: true,
+      set: (value: Date | string) => {
+        // Handle both string or Date input types
+        const date =
+          typeof value === "string" ? new Date(value) : new Date(value.getTime());
+        // Convert to UTC (subtract local timezone offset)
+        return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      },
     },
   },
   {
@@ -63,15 +77,14 @@ const saleSchema = new Schema<ISales>(
   }
 );
 
-
-// Delete cached model if exists (important in Next.js dev)
+// Delete cached model (important for Next.js dev environment)
 if (mongoose.models.SaleDatabaseModel) {
   delete mongoose.models.SaleDatabaseModel;
 }
 
-
-// Export SaleDatabaseModel Model
+// Export Model
 const SaleDatabaseModel =
-  models?.SaleDatabaseModel || model<ISales>("SaleDatabaseModel", saleSchema, "sale_collection");
+  models?.SaleDatabaseModel ||
+  model<ISales>("SaleDatabaseModel", saleSchema, "sale_collection");
 
 export default SaleDatabaseModel;
