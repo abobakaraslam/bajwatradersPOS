@@ -3,15 +3,20 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Stock from "@/models/StockDatabase";
 import Purchase from "@/models/PurchaseDatabase";
 
+// ✅ Disable Next.js caching at route level
+export const dynamic = "force-dynamic";
+export const revalidate = 0; // Prevent ISR
+export const fetchCache = "force-no-store"; // Prevent data caching by Next.js
+export const runtime = "nodejs"; // Ensure runs on server
+
 // GET: Fetch all stock records
 export async function GET() {
   try {
     await connectToDatabase();
 
-    //const stockRecords = await Stock.find().sort({ productName: 1 }); // sorted alphabetically
-
     // Dynamically use the actual collection name from Mongoose model
     const purchaseCollection = Purchase.collection.name;
+
     const stockRecords = await Stock.aggregate([
       {
         $lookup: {
@@ -38,25 +43,57 @@ export async function GET() {
     ]);
 
     if (!stockRecords || stockRecords.length === 0) {
-      return NextResponse.json({
-        success: false,
-        message: "No stock records found",
-        stock: [],
-      });
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          message: "No stock records found",
+          stock: [],
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
     }
 
-    //console.log("stockRecords: ", stockRecords);
-
-
-    return NextResponse.json({
-      success: true,
-      stock: stockRecords,
-    });
+    // ✅ Always send no-cache headers
+    return new NextResponse(
+      JSON.stringify({
+        success: true,
+        stock: stockRecords,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Error fetching stock records:", error);
-    return NextResponse.json(
-      { success: false, message: "Error fetching stock data", error: error.message },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({
+        success: false,
+        message: "Error fetching stock data",
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
     );
   }
 }
