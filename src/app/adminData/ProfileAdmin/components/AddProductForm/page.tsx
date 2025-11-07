@@ -1,6 +1,8 @@
 /*File: page.tsx located in src/app/adminData/ProfileAdmin/component/AddProductForm/   */
 "use client";
+
 export const revalidate = 0;
+
 import { useState, useEffect } from "react";
 import { redirect, useRouter } from "next/navigation";
 import Select from "react-select";
@@ -104,7 +106,7 @@ export default function AddProductForm(): JSX.Element {
           try {
             //setLoading(true);
             setLoadingItems(true);
-            const res = await fetch("/api/userData/saleProduct");
+            const res = await fetch("/api/userData/saleProduct", { cache: "no-store" });
             console.log("response from fetching-products: ", res);
             const data = await res.json();
             console.log("data from fetching-products: ", data);
@@ -521,4 +523,3 @@ export default function AddProductForm(): JSX.Element {
     </div>
   );
 }
-
