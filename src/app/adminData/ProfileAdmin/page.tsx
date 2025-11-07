@@ -60,7 +60,7 @@ useEffect(() => {
           <>
             {/* Dashboard Content */}
             {activeView === "dashboard" && (
-              <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center mt-4">
                 {/* Add Item */}
                 <button
                   type="button"
@@ -132,7 +132,7 @@ useEffect(() => {
                     Stock Update
                   </span>
                 </button>
-              </>
+              </div>
             )}
 
             {/* Sale Form */}
