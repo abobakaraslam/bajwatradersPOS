@@ -2,16 +2,19 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Bill from "@/models/SaleDatabaseModel";
 
+export const dynamic = "force-dynamic"; // ✅ ensures no static caching
+export const revalidate = 0; // ✅ disables ISR caching
+
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const { startDate, endDate } = await req.json();
 
+    const { startDate, endDate } = await req.json();
     if (!startDate || !endDate) {
-      return NextResponse.json({
-        success: false,
-        message: "Both start and end dates are required.",
-      });
+      return NextResponse.json(
+        { success: false, message: "Both start and end dates are required." },
+        { status: 400 }
+      );
     }
 
     const start = new Date(startDate);
@@ -27,14 +30,8 @@ export async function POST(req: Request) {
       {
         $addFields: {
           date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          // Extract numeric part of billId (after the dash)
           billIdNumber: {
-            $toInt: {
-              $arrayElemAt: [
-                { $split: ["$billId", "-"] },
-                1,
-              ],
-            },
+            $toInt: { $arrayElemAt: [{ $split: ["$billId", "-"] }, 1] },
           },
         },
       },
@@ -60,24 +57,22 @@ export async function POST(req: Request) {
           },
         },
       },
-      // ✅ Sort by date ascending, then numeric billId ascending
-      {
-        $sort: { "_id.date": 1, "_id.billIdNumber": 1 },
-      },
-      // Clean up unnecessary fields if needed
-      {
-        $project: {
-          "_id.billIdNumber": 0, // hide helper field
-        },
-      },
+      { $sort: { "_id.date": 1, "_id.billIdNumber": 1 } },
+      { $project: { "_id.billIdNumber": 0 } },
     ]);
 
-    return NextResponse.json({ success: true, bills });
+    // ✅ Force no-cache headers in the response
+    const response = NextResponse.json({ success: true, bills });
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+
+    return response;
   } catch (error) {
     console.error("Error fetching grouped bills:", error);
-    return NextResponse.json({
-      success: false,
-      message: "Error fetching grouped bills.",
-    });
+    return NextResponse.json(
+      { success: false, message: "Error fetching grouped bills." },
+      { status: 500 }
+    );
   }
 }
