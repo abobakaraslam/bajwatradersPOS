@@ -106,10 +106,13 @@ export default function AddProductForm(): JSX.Element {
             setLoadingItems(true);
             const res = await fetch("/api/userData/saleProduct");
             console.log("response from fetching-products: ", res);
-            if (!res.ok) throw new Error("Failed to fetch products");
             const data = await res.json();
             console.log("data from fetching-products: ", data);
-    
+
+            if(!data.success){
+              console.log("not fetch products, reason: ", data.message)
+            }
+            
             const extracted_array = data.products.map((product: any) => {
               const stockItem = data.stock.find(
                 (s: any) => s.productId === product.productId
