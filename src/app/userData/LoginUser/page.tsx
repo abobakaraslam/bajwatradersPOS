@@ -1,3 +1,4 @@
+/*File: page.jsx located in app/userData/LoginUser/     */
 "use client";
 
 import { useState } from "react";
@@ -32,13 +33,13 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.toLowerCase().trim(), password }),
-        credentials: "include", // 🔥 VERY IMPORTANT — ensures cookies are stored/sent
+        credentials: "include", // ensures cookies are stored/sent
       });
 
       const data = await response.json();
 
       if (data.success === "OK") {
-        await refreshSession();
+        console.log("successfully logged in");
         router.push("/userData/ProfileUser");
       } else {
         setError(data.message || "Invalid email or password");
