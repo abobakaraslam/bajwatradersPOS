@@ -1,8 +1,6 @@
 /*File: page.tsx located in src/app/adminData/ProfileAdmin/component/AddProductForm/   */
 "use client";
 
-export const revalidate = 0;
-
 import { useState, useEffect } from "react";
 import { redirect, useRouter } from "next/navigation";
 import Select from "react-select";
@@ -523,3 +521,4 @@ export default function AddProductForm(): JSX.Element {
     </div>
   );
 }
+
