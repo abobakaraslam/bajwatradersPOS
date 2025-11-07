@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import SaleDatabaseModel from "@/models/SaleDatabaseModel";
-//import ProductNameDatabase from "@/models/ProductNameDatabase";
 
-// GET /api/bills/[billId]
+// Disable any caching globally for this route
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(
   request: Request,
   { params }: { params: { billId: string } }
@@ -11,55 +13,54 @@ export async function GET(
   try {
     await connectToDatabase();
 
-    //console.log("params: ", params);
-
     const { billId } = params;
-    const bill_fetched = await SaleDatabaseModel.find({ billId: billId });
+    const bill_fetched = await SaleDatabaseModel.find({ billId });
 
-    //console.log("bill_fetched new: ", bill_fetched);
-
-    let billData: any[] = [];
-    //let priceTotal = 0;
-
-    for (let index = 0; index < bill_fetched.length; index++) {
-      const item = bill_fetched[index];
-
-      
-      const productId_get = item.productId;
-      /*
-      const product_fetch = await ProductNameDatabase.findOne({ productId: //productId_get });
-
-      let productName_get = "";
-      if (product_fetch) {
-        productName_get = product_fetch.productName;
-      }
-        */
-      //let priceSaleAmount_get = item.priceSaleAmount;
-      //priceTotal = priceTotal + priceSaleAmount_get
-        // Push one clean record to billData
-      billData.push({
-        productId: productId_get,
-        productName: item.productName,
-        quantitySold: item.quantitySold,
-        priceSalePerUnit: item.priceSalePerUnit,
-        priceSaleAmount: item.priceSaleAmount,
-        customerId: item.customerId,
-        billId: item.billId,
-        createdAt: item.createdAt,
-      });
-    }
-    //console.log("billData Data:", billData);
-
-    if (!bill_fetched) {
-      return NextResponse.json({ message: "billData not found" }, { status: 404 });
+    if (!bill_fetched || bill_fetched.length === 0) {
+      return new NextResponse(
+        JSON.stringify({ message: "Bill data not found" }),
+        {
+          status: 404,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+          },
+        }
+      );
     }
 
-    return NextResponse.json(billData, { status: 200 });
+    const billData = bill_fetched.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      quantitySold: item.quantitySold,
+      priceSalePerUnit: item.priceSalePerUnit,
+      priceSaleAmount: item.priceSaleAmount,
+      customerId: item.customerId,
+      billId: item.billId,
+      createdAt: item.createdAt,
+    }));
+
+    return new NextResponse(JSON.stringify(billData), {
+      status: 200,
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+    });
   } catch (error) {
     console.error("Error fetching bill:", error);
-    return NextResponse.json(
-      { message: "Error fetching bill", error },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ message: "Error fetching bill", error }),
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
     );
   }
 }
