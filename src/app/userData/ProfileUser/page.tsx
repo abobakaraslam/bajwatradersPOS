@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import BillRecord from "./component/BillRecord/page";
 import SaleProduct from "./component/SaleProduct/page";
 
-import { useSession } from "@/context/SessionContext";
+//import { useSession } from "@/context/SessionContext";
 
 
 
 export default function ProfileAdmin(): JSX.Element {
-  const { isLoggedIn, checking, refreshSession } = useSession();
+  //const { isLoggedIn, checking, refreshSession } = useSession();
   
   const [loading, setLoading] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<"dashboard" | "sale" | "bill">("dashboard");
@@ -30,7 +30,7 @@ useEffect(() => {
         console.log("Reason: ", data.reason);
         router.push("/userData/LoginUser");
       } else {
-        await refreshSession();
+        //await refreshSession();
         console.log("successfully login");
         console.log("Reason: ", data.reason);
         setLoading(false);
