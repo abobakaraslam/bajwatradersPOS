@@ -212,6 +212,10 @@ button:hover {
     color: var(--color5)
   }
 
+  .containerUser1 .formBG {
+    background-color: var(--color6);
+  }
+
 
   /* ────────────────────────────────────────────── */
   /* Theme 2 → User2 (Green Scheme)                 */
