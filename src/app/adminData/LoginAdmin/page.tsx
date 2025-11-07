@@ -1,3 +1,5 @@
+/*File: page.jsx located in app/adminData/LoginAdmin/     */
+
 "use client";
 
 import {useState } from "react";
@@ -33,13 +35,15 @@ export default function LoginAdmin() {
           email: email.toLowerCase().trim(),
           password,
         }),
+        credentials: "include", // ensures cookies are stored/sent
       });
 
       const data = await response.json();
       //console.log("data: ", data)
 
-      if (data.status === "OK") {
+      if (data.success === "OK") {
         await refreshSession();
+        console.log("successfully logged in");
         router.push("/adminData/ProfileAdmin");
       } else {
         setButtonDisable(false);
