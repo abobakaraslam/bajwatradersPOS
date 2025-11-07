@@ -3,6 +3,7 @@
 
 import { useState, useMemo } from "react";
 
+
 interface BillGroup {
   _id: { billId: string; date: string };
   totalSaleAmount: number;
@@ -46,7 +47,8 @@ export default function BillRecord(): JSX.Element {
     setError("");
     setLoading(true);
 
-    const finalEndDate = endDate || startDate;
+   const formattedStartDate = startDate;
+    const formattedEndDate = endDate || startDate;
 
     try {
       const response = await fetch("/api/adminData/billRecord/getByDate", {
@@ -59,8 +61,8 @@ export default function BillRecord(): JSX.Element {
           Expires: "0",
         },
         body: JSON.stringify({
-          startDate,
-          endDate: finalEndDate,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
         }),
       });
 
