@@ -51,12 +51,19 @@ export default function BillRecord(): JSX.Element {
     try {
       const response = await fetch("/api/adminData/billRecord/getByDate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        cache: "no-store", // prevents browser & proxy caching
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
         body: JSON.stringify({
           startDate,
           endDate: finalEndDate,
         }),
       });
+
 
       const data = await response.json();
 
