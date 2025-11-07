@@ -1,4 +1,4 @@
-// src/context/SessionContext.tsx
+// File: SessionContext.tsx located in src/context/SessionContext.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -22,7 +22,9 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const refreshSession = async () => {
     setChecking(true);
     try {
-      const res = await fetch("/api/auth/validate-session");
+      const res = await fetch("/api/auth/validate-session", {
+        credentials: "include" // ensures cookies are stored/sent
+      });
       const data = await res.json();
       setIsLoggedIn(data.valid);
     } catch {
