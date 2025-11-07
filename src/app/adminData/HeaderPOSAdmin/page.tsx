@@ -28,7 +28,7 @@ export default function HeaderPOSAdmin() {
         {/* Left Side — Logo and Title */}
         <div
           className="cursor-pointer flex"
-          onClick={() => router.push("/adminData/ProfileAdmin")}
+          onClick={() => router.push("/")}
         >
           <div className="flex">
             <img
