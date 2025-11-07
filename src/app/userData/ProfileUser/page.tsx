@@ -39,7 +39,7 @@ useEffect(() => {
   return (
     <div className="flex flex-col m-0 p-0 ">
       {/* Main Content */}
-      <div id="mainContent" className="flex flex-col items-center justify-center p-6 flex-grow">
+      <div id="mainContent" className="flex flex-col items-center justify-center flex-grow">
         {loading ? (
           // Loading View
           <div className="flex flex-col items-center mt-12 mb-12">
