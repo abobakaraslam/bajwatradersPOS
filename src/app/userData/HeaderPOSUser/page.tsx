@@ -7,6 +7,7 @@ export default function HeaderPOSUser() {
   const router = useRouter();
   const { isLoggedIn, checking, refreshSession } = useSession();
 
+  
   const handleLogout = async () => {
     try {
       const res = await fetch("/api/auth/logout", { method: "POST" });
@@ -29,7 +30,7 @@ export default function HeaderPOSUser() {
         {/* Left Side — Logo and Title */}
         <div
           className="cursor-pointer flex"
-          onClick={() => router.push("/userData/ProfileUser")}
+          onClick={() => router.push("/")}
         >
           <div className="flex">
             <img
