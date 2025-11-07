@@ -18,14 +18,14 @@ export const revalidate = 0;
  * Converts a Pakistan local datetime string to a UTC Date object
  * Example input: "2025-11-08T01:23:39"
  */
-export function pakistanLocalToUTC(localDateTime: string): Date {
+function pakistanLocalToUTC(localDateTime: string): Date {
   // Interpret the provided time as being in Asia/Karachi
   const dateInPakistan = new Date(localDateTime + "+05:00");
   return dateInPakistan; // MongoDB will store in UTC automatically
 }
 
 
-export function getPakistanDateTime(): Date {
+function getPakistanDateTime(): Date {
   const now = new Date();
   const options: Intl.DateTimeFormatOptions = { timeZone: "Asia/Karachi" };
 
