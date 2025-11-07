@@ -1,4 +1,5 @@
 /*File: route.ts located in src/app/api/userData/saleProduct          */
+export const revalidate = 0;
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Product from "@/models/ProductNameDatabase";
@@ -30,3 +31,4 @@ export async function GET() {
     );
   }
 }
+
