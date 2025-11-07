@@ -16,16 +16,16 @@ useEffect(() => {
   //console.log("ProfileUser is loading...");
     async function validateSession() {
       const res = await fetch("/api/auth/validate-session", {
-        credentials: "include"  // this is critical
+        credentials: "include" // ensures cookies are stored/sent
       });
       const data = await res.json();
-      //console.log("ProfileUser Page, Responsded data from /api/auth/validate-session ", data)
       if (!data.valid) {
         console.log("Return to LoginUser page");
         console.log("Reason: ", data.reason);
         router.push("/userData/LoginUser");
       } else {
         console.log("successfully login");
+        console.log("Reason: ", data.reason);
         setLoading(false);
       }
     }
