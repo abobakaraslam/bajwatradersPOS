@@ -1,4 +1,4 @@
-/* File: src/app/api/userData/login_user/route.ts */
+/* File: route.ts located in src/app/api/userData/login_user/route.ts */
 
 import { NextResponse } from "next/server";
 import User from "@/models/User";
