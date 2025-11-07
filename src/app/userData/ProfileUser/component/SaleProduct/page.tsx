@@ -157,8 +157,8 @@ function SaleProduct() {
   };
 
   return (
-    <div className="p-6 mx-auto w-full sm:w-3/4 md:w-2/3 lg:w-1/2">
-      <h2 className="text-2xl font-bold pt-0 text-center text-gray-800 dark:text-white">
+    <div className="formBG w-full mt-6 sm:w-11/12 md:w-11/12 lg:w-2/3 xl:w-1/2 mx-auto pt-6 p-3 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold p-0 m-0 pt-0 text-center text-gray-800 dark:text-white">
         Items Sale
       </h2>
 
@@ -202,7 +202,7 @@ function SaleProduct() {
         </div>
 
         {/* Cart */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
           <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-white">
             🛒 Cart Items
           </h3>
