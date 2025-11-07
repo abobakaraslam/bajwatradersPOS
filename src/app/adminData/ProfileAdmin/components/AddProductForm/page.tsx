@@ -97,6 +97,7 @@ export default function AddProductForm(): JSX.Element {
   
   const MAX_TYPES = 5;
 
+
   // Fetch products
       useEffect(() => {
         const fetchProducts = async () => {
@@ -104,6 +105,7 @@ export default function AddProductForm(): JSX.Element {
             //setLoading(true);
             setLoadingItems(true);
             const res = await fetch("/api/userData/saleProduct");
+            console.log("response from fetching-products: ", res);
             if (!res.ok) throw new Error("Failed to fetch products");
             const data = await res.json();
     
