@@ -6,7 +6,6 @@ interface StockItem {
   productId: string;
   productName: string;
   availableQuantity: number;
-  
   pricePurchase: number;
   priceSale: number;
 }
@@ -18,26 +17,34 @@ export default function StockView(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [priceAllStock, setpriceAllStock] = useState(0);
 
-  // Fetch Stock Data from API
+  // ✅ Fetch Stock Data from API with no caching
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await fetch("/api/adminData/stock/getAll", { method: "GET" });
+        const response = await fetch("/api/adminData/stock/getAll", {
+          method: "GET",
+          cache: "no-store", // 🚀 Prevents caching in Next.js & browser
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+
         const data = await response.json();
-        //console.log("stock view dasta", data);
 
         if (data.success) {
           setStockData(data.stock);
           setFilteredStock(data.stock);
 
-          let priceTotalPurchase = 0;
-          for (let index = 0; index < data.stock.length; index++) {
-            let unit_price_per_item = data.stock[index].pricePurchase;
-            let quantity_item = data.stock[index].availableQuantity;
-            priceTotalPurchase = priceTotalPurchase + unit_price_per_item*quantity_item;
-          }
-          //console.log("priceTotalPurchase: ", priceTotalPurchase)
-          setpriceAllStock(priceTotalPurchase);
+          // ✅ Calculate total purchase amount
+          const totalPurchaseValue = data.stock.reduce(
+            (sum: number, item: StockItem) =>
+              sum + item.pricePurchase * item.availableQuantity,
+            0
+          );
+          setpriceAllStock(totalPurchaseValue);
         }
       } catch (error) {
         console.error("Error fetching stock data:", error);
@@ -49,7 +56,7 @@ export default function StockView(): JSX.Element {
     fetchStock();
   }, []);
 
-  // Filter by search term
+  // ✅ Filter stock by search term
   useEffect(() => {
     const filtered = stockData.filter((item) =>
       item.productName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,14 +73,17 @@ export default function StockView(): JSX.Element {
     );
 
   return (
-    <div className="p-4  min-h-screen">
+    <div className="p-4 min-h-screen">
       {/* Heading */}
       <div className="text-center">
         <h2 className="text-2xl font-semibold text-gray-800 mb-3 sm:mb-0">
           📦 Stock Overview
         </h2>
 
-        <p className="mb-6"><span className="font-semibold">Total Purchase Amount: </span>{priceAllStock}</p>
+        <p className="mb-6">
+          <span className="font-semibold">Total Purchase Amount: </span>
+          {priceAllStock}
+        </p>
 
         {/* Search Bar */}
         <input
@@ -107,8 +117,12 @@ export default function StockView(): JSX.Element {
                     index % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
                 >
-                  <td className="px-4 py-2 text-sm text-gray-800 font-medium">{item.productName}</td>
-                  <td className="px-4 py-2 text-center text-sm text-gray-800">{item.availableQuantity}</td>
+                  <td className="px-4 py-2 text-sm text-gray-800 font-medium">
+                    {item.productName}
+                  </td>
+                  <td className="px-4 py-2 text-center text-sm text-gray-800">
+                    {item.availableQuantity}
+                  </td>
                   <td className="px-4 py-2 text-center text-sm text-green-700">
                     Rs. {item.pricePurchase}
                   </td>
@@ -122,7 +136,10 @@ export default function StockView(): JSX.Element {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-6 text-gray-500 font-medium">
+                <td
+                  colSpan={6}
+                  className="text-center py-6 text-gray-500 font-medium"
+                >
                   No products found.
                 </td>
               </tr>
