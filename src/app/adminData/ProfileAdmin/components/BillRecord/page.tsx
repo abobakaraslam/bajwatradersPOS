@@ -1,3 +1,4 @@
+/*File: page.tsx located in src/app/adminData/ProfileAdmin/component/BillRecord/    */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -35,7 +36,7 @@ export default function BillRecord(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // ✅ Fetch Bills
+  // Fetch Bills
   const handleGetBills = async () => {
     if (!startDate) {
       setError("Please select a start date.");
@@ -93,7 +94,7 @@ export default function BillRecord(): JSX.Element {
     );
   }, [bills]);
 
-  // ✅ Group Bills by Date
+  // Group Bills by Date
   const groupedByDate = useMemo(() => {
     const groups: Record<
       string,
@@ -131,7 +132,7 @@ export default function BillRecord(): JSX.Element {
   return (
     <div className="flex flex-col items-center min-h-screen py-10 px-6">
       {/* Header */}
-      <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-3xl border border-gray-200">
+      <div className="formBG shadow-md rounded-2xl p-6 w-full max-w-3xl border border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
           Bill Record Filter
         </h2>
