@@ -2,14 +2,28 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Bill from "@/models/SaleDatabaseModel";
 
-export const dynamic = "force-dynamic"; // ✅ ensures no static caching
-export const revalidate = 0; // ✅ disables ISR caching
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+/**
+ * Converts Pakistan local date (YYYY-MM-DD) into correct UTC boundaries
+ * Example:
+ *   startDate = "2025-11-08"
+ *   → startDateUTC = 2025-11-07T19:00:00Z
+ *   → endDateUTC   = 2025-11-08T18:59:59Z
+ */
+function getPakistanDayRange(startDate: string, endDate: string) {
+  const startDateUTC = new Date(`${startDate}T00:00:00+05:00`);
+  const endDateUTC = new Date(`${endDate}T23:59:59+05:00`);
+  return { startDateUTC, endDateUTC };
+}
 
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
     const { startDate, endDate } = await req.json();
+
     if (!startDate || !endDate) {
       return NextResponse.json(
         { success: false, message: "Both start and end dates are required." },
@@ -17,19 +31,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    // Properly convert Pakistan-local day range into UTC
+    const { startDateUTC, endDateUTC } = getPakistanDayRange(startDate, endDate);
 
+    console.log("Pakistan range to UTC:");
+    console.log("startDateUTC:", startDateUTC.toISOString());
+    console.log("endDateUTC:", endDateUTC.toISOString());
+
+    // Example DB entry: iDate: "2025-11-07T21:12:37.000+00:00"
     const bills = await Bill.aggregate([
       {
         $match: {
-          createdAt: { $gte: start, $lte: end },
+          iDate: { $gte: startDateUTC, $lte: endDateUTC },
         },
       },
       {
         $addFields: {
-          date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          date: { $dateToString: { format: "%Y-%m-%d", date: "$iDate" } },
           billIdNumber: {
             $toInt: { $arrayElemAt: [{ $split: ["$billId", "-"] }, 1] },
           },
@@ -61,7 +79,7 @@ export async function POST(req: Request) {
       { $project: { "_id.billIdNumber": 0 } },
     ]);
 
-    // ✅ Force no-cache headers in the response
+    // Force no-cache for fresh data
     const response = NextResponse.json({ success: true, bills });
     response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     response.headers.set("Pragma", "no-cache");
