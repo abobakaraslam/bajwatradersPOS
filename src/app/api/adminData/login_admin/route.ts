@@ -1,3 +1,5 @@
+/* File: route.ts located in src/app/api/adminData/login_admin/route.ts */
+
 import { NextResponse } from "next/server";
 import Admin from "@/models/Admin";
 import { connectToDatabase } from "@/lib/mongodb";
@@ -45,18 +47,40 @@ export async function POST(req: Request) {
     
       const expiresAt = new Date(Date.now() + 1000 * 60 * 30); // 30 min
     
-      const session_create = await Session.create({ sessionId, userId: admin._id, token, expiresAt });
+      await Session.create({ sessionId, userId: admin._id, token, expiresAt });
       
     
+      // Cookie settings
+      const isProduction = process.env.NODE_ENV === "production";
+
+      
+      if (!isProduction) {
+      // Localhost or Development
+      //in case of localhost or unsecure website (without SSL certificate, http)
       cookies().set("sessionId", sessionId, {
         httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        secure: false,          // not using HTTPS locally
+        sameSite: "lax",
+        maxAge: 60 * 30,        // 30 minutes
+        path: "/",              
+        domain: undefined,      // no domain restriction for localhost
+      });
+    } else {
+      // Production
+      cookies().set("sessionId", sessionId, {
+        httpOnly: true,
+        secure: true,           // HTTPS only
+        sameSite: "strict",     // better protection in production
         maxAge: 60 * 30,
         path: "/",
+        domain: ".edu2skill.online", // use your top-level domain (include dot for subdomains)
       });
+    }
     
-      return Response.json({ status: "OK", message: "Login successful" });
+      return Response.json({
+        success: "OK",
+        message: "Login successful"
+      });
 
   } catch (error) {
     console.error("Login error:", error);
