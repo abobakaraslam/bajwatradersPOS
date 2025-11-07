@@ -34,7 +34,10 @@ function SaleProduct() {
     const fetchProducts = async () => {
       try {
         setLoadingItems(true);
-        const res = await fetch("/api/userData/saleProduct");
+        const res = await fetch("/api/userData/saleProduct", {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-store" },
+        });
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
 
@@ -134,8 +137,12 @@ function SaleProduct() {
 
       const res = await fetch("/api/userData/generateBill", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart: cart }),
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        },
+        cache: "no-store",
+        body: JSON.stringify({ cart }),
       });
 
       if (!res.ok) throw new Error("Failed to generate bill");
