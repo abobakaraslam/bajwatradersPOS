@@ -1,4 +1,4 @@
-/*File: route.ts located in api/userData/generateBill/     */
+/* File: route.ts located in api/userData/generateBill/ */
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import SaleDatabaseModel from "@/models/SaleDatabaseModel";
@@ -10,78 +10,92 @@ interface PurchaseDatabase {
   pricePurchase: number;
 }
 
+// Disable caching for this route globally
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
+
     const { cart } = await req.json();
 
     if (!cart || cart.length === 0) {
-      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: "Cart is empty" }),
+        {
+          status: 400,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+          },
+        }
+      );
     }
-    //console.log("cart: ", cart);
-    //console.log("specific price: ",cart[0].priceSale);
 
-    /*
-    Insertion in SaleDatabaseModel
-    */
-    // Get number of Sales
     let rand_number = Math.floor(Math.random() * 90) + 10;
     let n_sale = await SaleDatabaseModel.countDocuments();
+    let billID = `Bill-${n_sale + 1}-${rand_number}`;
 
-
-    let billID = `Bill-${n_sale+1}-${rand_number}`;
-    
     for (let index = 0; index < cart.length; index++) {
-      let priceSale = cart[index].priceSale;
-      let productId = cart[index].productId;
-      let quantitySale = cart[index].quantitySale;
+      const { productId, priceSale, quantitySale } = cart[index];
 
-      const product_fetched = await PurchaseDatabase.find({ productId: productId });
-      ////console.log("product_fetched: ", product_fetched);
+      const product_fetched = await PurchaseDatabase.find({ productId });
+      const pricePurchase_fetched = product_fetched[0].pricePurchase;
 
-      let pricePurchase_fetched = product_fetched[0].pricePurchase;
+      const productName_fetched = await ProductNameDatabase.find({ productId });
+      const productName_get = productName_fetched[0].productName;
 
-      let assignSaleid = `Sale-${n_sale + 1}-${rand_number}`;
+      const assignSaleid = `Sale-${n_sale + 1}-${rand_number}`;
 
-
-      const productName_fetched = await ProductNameDatabase.find({ productId: productId });
-      ////console.log("product_fetched: ", product_fetched);
-
-      let productName_get = productName_fetched[0].productName;
-
-      //below should be based on schema
-      // Insert new entry into database
       await SaleDatabaseModel.create({
         saleId: assignSaleid,
-        productId: productId,
+        productId,
         productName: productName_get,
         quantitySold: quantitySale,
         priceSalePerUnit: priceSale,
-        priceSaleAmount: quantitySale*priceSale,
-        pricePurchase: pricePurchase_fetched*quantitySale,
-        profit: (priceSale - pricePurchase_fetched)*quantitySale,
+        priceSaleAmount: quantitySale * priceSale,
+        pricePurchase: pricePurchase_fetched * quantitySale,
+        profit: (priceSale - pricePurchase_fetched) * quantitySale,
         customerId: billID,
-        billId: billID
+        billId: billID,
       });
-      ////console.log("product inserted");
 
-      n_sale = n_sale + 1;
+      n_sale += 1;
 
       await StockDatabase.updateOne(
-              { productId: productId },
-              { $inc: { availableQuantity: -quantitySale } }
+        { productId },
+        { $inc: { availableQuantity: -quantitySale } }
       );
-
     }
 
-    
-    return NextResponse.json({
-      success: true,
-      billId: billID,
-    });
-    
+    return new NextResponse(
+      JSON.stringify({
+        success: true,
+        billId: billID,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to generate bill" }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to generate bill" }),
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   }
 }
