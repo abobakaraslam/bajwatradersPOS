@@ -118,7 +118,83 @@ export default function BillPage() {
           id="mainContent"
           className="receipt-container max-w-2xl mx-auto mt-8 bg-white rounded-lg shadow px-2 pb-2"
         >
-          <h1 className="receipt-title text-2xl font-semibold mb-4 text-center">
+
+          {/* ─── Print Styles ─────────────────────────────────────────────── */}
+          <style jsx global>{`
+            @media print {
+              .no-print {
+                display: none !important;
+              }
+              @page {
+                size: 70mm auto;
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+              body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 70mm !important;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-family: "Arial", sans-serif;
+                font-size: 13px;
+                color: #000;
+                box-sizing: border-box !important;
+                text-align: left !important;
+              }
+              .receipt-container {
+                width: 70mm !important;
+                margin: 0 !important;
+                padding: 8px !important;
+                font-family: "Courier New", monospace !important;
+                color: #000 !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+              }
+              * {
+                color: #000 !important;
+                font-weight: 600 !important;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 8px;
+              }
+              th,
+              td {
+                padding: 2px 0;
+                font-size: 12px;
+                border: 1px solid #000;
+              }
+              th {
+                font-weight: 700 !important;
+              }
+              h1 {
+                font-size: 16px;
+                font-weight: bold;
+              }
+              p {
+                font-size: 11px;
+              }
+              .receipt-total {
+                text-align: right;
+                margin-top: 6px;
+                font-size: 14px;
+                font-weight: bold;
+              }
+              .footer-text {
+                text-align: center;
+                font-size: 10px;
+                margin-top: 10px;
+                border-top: 1px dashed #000;
+                padding-top: 5px;
+              }
+            }
+          `}</style>
+
+          <h1 className="receipt-title text-xl font-semibold mb-4 text-center">
             Bajwa Traders
           </h1>
 
