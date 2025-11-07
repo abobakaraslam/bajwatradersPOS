@@ -248,6 +248,10 @@ button:hover {
     background-color: var(--color3);
   }
 
+  .containerUser2 .formBG {
+    background-color: var(--color3);
+  }
+
   .containerUser2 footer {
     color: var(--color2)
   }
