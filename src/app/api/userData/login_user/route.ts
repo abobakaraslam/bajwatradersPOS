@@ -45,14 +45,29 @@ export async function POST(req: Request) {
     // Cookie settings
     const isProduction = process.env.NODE_ENV === "production";
 
+    
+    if (!isProduction) {
+    // Localhost or Development
+    //in case of localhost or unsecure website (without SSL certificate, http)
     cookies().set("sessionId", sessionId, {
       httpOnly: true,
-      secure: false,                 
+      secure: false,          // not using HTTPS locally
       sameSite: "lax",
-      maxAge: 60 * 30,                      // 30 minutes
-      path: "/",                            // Available across site
-      domain: undefined,
+      maxAge: 60 * 30,        // 30 minutes
+      path: "/",              
+      domain: undefined,      // no domain restriction for localhost
     });
+  } else {
+    // Production
+    cookies().set("sessionId", sessionId, {
+      httpOnly: true,
+      secure: true,           // HTTPS only
+      sameSite: "strict",     // better protection in production
+      maxAge: 60 * 30,
+      path: "/",
+      domain: ".edu2skill.online", // use your top-level domain (include dot for subdomains)
+    });
+  }
 
     return NextResponse.json({
       success: "OK",
@@ -67,6 +82,3 @@ export async function POST(req: Request) {
     });
   }
 }
-
-
-
