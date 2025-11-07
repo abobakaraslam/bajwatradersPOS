@@ -16,7 +16,7 @@ export async function GET() {
     // Get session cookie
     const sessionId = cookies().get("sessionId")?.value;
     if (!sessionId) {
-      return NextResponse.json({ valid: false, reason: "No session get from cookies" });
+      return NextResponse.json({ valid: false, reason: "SSL Certificate Expired\nNo session get from cookies" });
     }
 
     // Verify session in DB
@@ -30,7 +30,7 @@ export async function GET() {
       return NextResponse.json({ valid: false, reason: "Session expired" });
     }
 
-    return NextResponse.json({ valid: true });
+    return NextResponse.json({ valid: true, reason: "session is tested and ok" });
   } catch (err) {
     console.error("validate-session error:", err);
     return NextResponse.json({ valid: false, reason: "Server error" });
