@@ -15,7 +15,7 @@ export default function Home() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-start overflow-hidden">
-        <h1 className="text-4xl font-bold mb-2">Bajwa Traders</h1>
+        <h1 className="text-3xl font-bold mb-2">Bajwa Traders</h1>
 
         {/* Header Section */}
         <div className="flex items-center justify-center mb-8 space-x-2">
@@ -26,7 +26,7 @@ export default function Home() {
             height={40}
             className="object-contain"
           />
-          <h2 className="text-2xl font-semibold text-[#0F6466] tracking-wide">
+          <h2 className="text-xl font-semibold text-[#0F6466] tracking-wide">
             Point of Sale
           </h2>
         </div>
@@ -74,11 +74,11 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="mt-10 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             Software developed by{" "}
             <span className="font-semibold text-gray-700">M. Abo Bakar Aslam</span>
           </p>
-          <p className="text-sm text-gray-500">+92-313-5369068</p>
+          <p className="text-xs text-gray-500">+92-313-5369068</p>
         </footer>
       </div>
     </div>
