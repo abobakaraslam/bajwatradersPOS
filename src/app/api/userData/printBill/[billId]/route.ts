@@ -16,6 +16,26 @@ function pakistanLocalToUTC(localDateTime: string): Date {
 }
 
 /**
+ * Converts UTC date from MongoDB into Pakistan local date-time string.
+ * Example: 2025-11-07T19:00:00.000Z → 2025-11-08 00:00:00 (Pakistan time)
+ */
+function formatPakistanDateTime(date: Date): string {
+  return new Intl.DateTimeFormat("en-PK", {
+    timeZone: "Asia/Karachi",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+    .format(date)
+    .replace(",", "")
+    .replace(/\//g, "-");
+}
+
+/**
  * GET Bill Details by Bill ID (with date formatted correctly)
  * Example route: /api/userData/printBill/BILL-105
  */
@@ -47,7 +67,7 @@ export async function GET(
     // Ensure all date values are in proper ISO format
     const formattedBills = bills.map((bill) => ({
       ...bill,
-      iDate: new Date(bill.iDate).toISOString(), // Always ISO UTC format
+      iDate: formatPakistanDateTime(new Date(bill.iDate)),
     }));
 
     // Add headers to disable caching
