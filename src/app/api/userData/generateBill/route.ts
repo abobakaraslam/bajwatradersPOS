@@ -21,39 +21,27 @@ export const revalidate = 0;
 function pakistanLocalToUTC(localDateTime: string): Date {
   // Interpret the provided time as being in Asia/Karachi
   const dateInPakistan = new Date(localDateTime + "+05:00");
+  //console.log("dateInPakistan: ", dateInPakistan)
   return dateInPakistan; // MongoDB will store in UTC automatically
 }
 
 
+/**
+ * Returns the current Pakistan time as a Date (stored in UTC internally).
+ */
 function getPakistanDateTime(): Date {
+  // Current UTC timestamp
   const now = new Date();
-  const options: Intl.DateTimeFormatOptions = { timeZone: "Asia/Karachi" };
 
-  // Convert to Pakistan time zone
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    ...options,
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  // Convert UTC to Pakistan time (UTC+5)
+  const pakistanTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+  //console.log("returning pakistanTime: ", pakistanTime)
+  const pakistanTime_formated = pakistanTime.toISOString()
 
-  const parts = formatter.formatToParts(now);
-  const get = (type: string) => parts.find((p) => p.type === type)?.value || "00";
-
-  const year = get("year");
-  const month = get("month");
-  const day = get("day");
-  const hour = get("hour");
-  const minute = get("minute");
-  const second = get("second");
-
-  // Create a Date in Pakistan time but store as UTC equivalent
-  return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}+05:00`);
+  //console.log("Pakistan Time (Local) pakistanTime_formated:", pakistanTime_formated);
+  return pakistanTime;
 }
+
 
 
 
@@ -84,8 +72,16 @@ export async function POST(req: Request) {
     //const getDate = getPakistanDateTime();
     //console.log("date now:", getDate.toISOString()); // will print UTC equivalent
 
+    /*
     const localDateTime = new Date(); // user’s current time (Pakistan local)
+    console.log("localDateTime: ", localDateTime)
     const iDateGet = pakistanLocalToUTC(localDateTime.toISOString().slice(0, 19)); // ensures +05:00 interpretation
+    console.log("iDateGet: ", iDateGet)
+    */
+   const iDateGet = getPakistanDateTime();
+   //console.log("Date going to DB, iDateGet: ", iDateGet)
+  //console.log("You can see this time using toISOStting():", iDateGet.toISOString());
+    
 
     for (let index = 0; index < cart.length; index++) {
       const { productId, priceSale, quantitySale } = cart[index];
@@ -98,6 +94,7 @@ export async function POST(req: Request) {
 
       const assignSaleid = `Sale-${n_sale + 1}-${rand_number}`;
 
+      
       await SaleDatabaseModel.create({
         saleId: assignSaleid,
         productId,
@@ -118,6 +115,7 @@ export async function POST(req: Request) {
         { productId },
         { $inc: { availableQuantity: -quantitySale } }
       );
+
     }
 
     return new NextResponse(
