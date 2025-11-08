@@ -34,9 +34,9 @@ export async function POST(req: Request) {
     // Properly convert Pakistan-local day range into UTC
     const { startDateUTC, endDateUTC } = getPakistanDayRange(startDate, endDate);
 
-    console.log("Pakistan range to UTC:");
-    console.log("startDateUTC:", startDateUTC.toISOString());
-    console.log("endDateUTC:", endDateUTC.toISOString());
+    //console.log("Pakistan range to UTC:");
+    //console.log("startDateUTC:", startDateUTC.toISOString());
+    //console.log("endDateUTC:", endDateUTC.toISOString());
 
     // Example DB entry: iDate: "2025-11-07T21:12:37.000+00:00"
     const bills = await Bill.aggregate([
