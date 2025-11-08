@@ -16,6 +16,7 @@ interface BillGroup {
 }
 
 const formatDate = (isoString: string) => {
+  //console.log("get value isoString: ", isoString);
   return new Date(isoString).toLocaleString("en-PK", {
     weekday: "short",
     day: "2-digit",
@@ -43,6 +44,7 @@ export default function BillRecord(): JSX.Element {
     setError("");
     setLoading(true);
 
+    
     const formattedStartDate = startDate;
     const formattedEndDate = endDate || startDate;
 
@@ -70,6 +72,7 @@ export default function BillRecord(): JSX.Element {
           (a: BillGroup, b: BillGroup) =>
             new Date(a._id.date).getTime() - new Date(b._id.date).getTime()
         );
+        //console.log("values in sorted: ", sorted);
 
         setBills(sorted);
         setShowBills(true);
