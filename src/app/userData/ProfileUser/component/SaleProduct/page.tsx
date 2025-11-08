@@ -29,6 +29,7 @@ function SaleProduct() {
 
   const router = useRouter();
 
+  
   // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -134,6 +135,7 @@ function SaleProduct() {
       setbuttonDisable(true);
       //console.log("cart: ", cart);
       
+
 
       const res = await fetch("/api/userData/generateBill", {
         method: "POST",
