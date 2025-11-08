@@ -12,7 +12,7 @@ interface BillItem {
   priceSaleAmount: number;
   customerId: string;
   billId: string;
-  iDate: string; // stored as ISO string in DB
+  iDate: Date; // stored as ISO string in DB
 }
 
 /**
@@ -34,6 +34,45 @@ const formatDate = (isoString: string): string => {
   });
 };
 
+function splitDateTimePak(date_pak: string): { formattedDate: string; formattedTime: string } {
+  // Example input: "08-11-2025 11:32:35"
+
+  // Split date and time
+  const [datePart, timePart] = date_pak.split(" ");
+
+  if (!datePart || !timePart) {
+    throw new Error("Invalid date format. Expected 'DD-MM-YYYY HH:mm:ss'");
+  }
+
+  // Split and parse date components
+  const [day, month, year] = datePart.split("-").map((v) => parseInt(v, 10));
+
+  // Convert to Date object
+  // Note: month index in JS Date is 0-based → subtract 1
+  const jsDate = new Date(year, month - 1, day);
+
+  // Arrays for month and weekday names
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  // Get day of week and month name
+  const weekday = dayNames[jsDate.getDay()];
+  const monthName = monthNames[month - 1];
+
+  // Format date as "Sat, 08-Nov-2025"
+  const formattedDate = `${weekday}, ${String(day).padStart(2, "0")}-${monthName}-${year}`;
+
+  return {
+    formattedDate,
+    formattedTime: timePart, // "11:32:35"
+  };
+}
+
+
+
 export default function BillPage() {
   const router = useRouter();
   const { billId } = useParams();
@@ -41,8 +80,26 @@ export default function BillPage() {
   const [billState, setBill] = useState<BillItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateBillState, setDateBillState] = useState("");
+  const [timeBillState, settimeBillState] = useState("");
   const [loadingDashboard, setLoadingDashboard] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(false);
+
+  function formatToPakistanTime(date: Date): string {
+  return date.toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
+}
+
+function getPakistanDateTime(): Date {
+  // Current UTC timestamp
+  const now = new Date();
+
+  // Convert UTC to Pakistan time (UTC+5)
+  const pakistanTime = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+  //console.log("returning pakistanTime: ", pakistanTime)
+  const pakistanTime_formated = pakistanTime.toISOString()
+
+  //console.log("Pakistan Time (Local) pakistanTime_formated:", pakistanTime_formated);
+  return pakistanTime;
+}
 
   useEffect(() => {
     const fetchBill = async () => {
@@ -57,8 +114,25 @@ export default function BillPage() {
           return item;
         });
 
+        /*
+         let date_from_DB = new Date(data[0].iDate);
+        console.log("Date from database: date_from_DB", date_from_DB);
+        // Subtract 5 hours (in milliseconds)
+        const current_date = new Date(date_from_DB.getTime() - 5 * 60 * 60 * 1000);
+        console.log("After subtracting 5 hours:", current_date);
+
+        console.log("Date: back display");
+        console.log("Displayed Pakistan time:", formatToPakistanTime(data[0].iDate));
+*/
         // Take first item's date (all items share same bill timestamp)
-        if (data.length > 0) setDateBillState(formatDate(data[0].iDate));
+        //if (data.length > 0) setDateBillState(data[0].iDate);
+        let date_pak = formatToPakistanTime(data[0].iDate);
+        const { formattedDate, formattedTime } = splitDateTimePak(date_pak);
+        
+        if (data.length > 0) {
+          setDateBillState(formattedDate);
+          settimeBillState(formattedTime);
+        }
 
         setBill(processedBills);
         setPriceTotal(total);
@@ -203,9 +277,13 @@ export default function BillPage() {
               <span className="font-bold">Bill ID: </span>
               {billId}
             </p>
-            <p className="text-left mb-5">
+            <p className="text-left">
               <span className="font-bold">Date: </span>
               {dateBillState}
+            </p>
+            <p className="text-left mb-5">
+              <span className="font-bold">Time: </span>
+              {timeBillState}
             </p>
             <p>
               <span className="font-bold">Price Unit: </span>Pakistani Rupees (Rs.)
